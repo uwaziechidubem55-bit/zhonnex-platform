@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Header from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
+import MediaUploader from "@/components/MediaUploader";
 import Link from "next/link";
 
 export default function TeacherSuite() {
@@ -11,6 +12,7 @@ export default function TeacherSuite() {
   const [queue, setQueue] = useState([{ name: "Chioma A.", tier: "Diamond" }, { name: "David O.", tier: "Platinum" }]);
   const [chat, setChat] = useState([{ user: "Gold • Amara", text: "Can you explain the edge firewall middleware again?" }, { user: "Platinum • Tunde", text: "Will the Cloud IDE support Python next cohort?" }]);
   const [msg, setMsg] = useState("");
+  const [notice, setNotice] = useState("");
 
   return (
     <div className="min-h-screen">
@@ -57,13 +59,15 @@ export default function TeacherSuite() {
               </div>
               <div className="aspect-[16/10] bg-[#0F0F12] p-4 relative">
                 <div className="text-xs tracking-widest font-bold text-white/50">CLOUD IDE MIRROR • Pane B</div>
-                <pre className="mt-3 text-xs leading-relaxed font-mono bg-black rounded-xl p-4 border border-white/10 overflow-auto">{`// ZHONNEX Cloud Workspace — live mirror
+                <pre className="mt-3 text-xs leading-relaxed font-mono bg-black rounded-xl p-4 border border-white/10 overflow-auto">
+{`// ZHONNEX Cloud Workspace — live mirror
 export function middleware(req) {
   const tier = req.cookies.get("tier");
   if (!tier) return Response.redirect("/gate");
   // RLS: verify passkey matches tier
   return NextResponse.next();
-}`}</pre>
+}`}
+                </pre>
                 <div className="absolute bottom-3 left-3 right-3 flex justify-between text-[11px]">
                   <span className="px-2 py-1 rounded-full bg-white text-black font-bold">SYNCED</span>
                   <span className="text-white/40">{layout === "mobile" ? "Hidden on mobile fallback" : "Split-screen active"}</span>
@@ -116,6 +120,17 @@ export function middleware(req) {
               </div>
             </div>
           </div>
+        </div>
+        <div className="mt-6 rounded-2xl bg-white text-black p-6">
+          <div className="text-xs tracking-[0.16em] font-bold text-black/50">SEND MEDIA TO STUDENT FEED — VIDEO / IMAGE / VOICE NOTE</div>
+          <p className="text-sm text-black/60 mt-2">Uploads to Supabase Storage + auto-injects into Student Learning Stream + WhatsApp blast. Tier-isolated.</p>
+          {notice && <div className="mt-3 rounded-xl bg-emerald-500 text-white px-4 py-2 text-sm font-bold">{notice}</div>}
+          <div className="mt-5 grid md:grid-cols-3 gap-4">
+            <MediaUploader bucket="videos" track="Frontend Architecture" tier="gold" author="Teacher • Lecture Suite" label="📹 Upload Lecture Video" onUploaded={() => { setNotice("✓ Video sent to Student Stream + Supabase Storage (videos bucket)"); setTimeout(()=>setNotice(""),4000); }} />
+            <MediaUploader bucket="images" track="Frontend Architecture" tier="gold" author="Teacher • Lecture Suite" label="🖼️ Upload Slide / Image" onUploaded={() => { setNotice("✓ Image sent to Student Stream + Supabase Storage (images bucket)"); setTimeout(()=>setNotice(""),4000); }} />
+            <MediaUploader bucket="voice-notes" track="Frontend Architecture" tier="gold" author="Teacher • Lecture Suite" label="🎙️ Upload Voice Note" onUploaded={() => { setNotice("✓ Voice note sent to Student Stream + Supabase Storage (voice-notes bucket)"); setTimeout(()=>setNotice(""),4000); }} />
+          </div>
+          <div className="mt-3 text-xs text-black/50">Each upload → <code>feed_items</code> table in Supabase + public URL → students see it in Tab 1: Learning Stream</div>
         </div>
       </div>
     </div>
