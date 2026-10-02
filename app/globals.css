@@ -1,0 +1,5 @@
+@tailwind base; @tailwind components; @tailwind utilities;
+:root { --obsidian: #050508; --charcoal: #0f0f12; }
+html, body { background: #050508; color: white; font-family: Inter, system-ui, sans-serif; }
+.glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.07); }
+.glow { background: radial-gradient(ellipse 800px 600px at 50% -10%, rgba(255,255,255,0.07), transparent 60%), radial-gradient(ellipse 600px 400px at 50% 40%, rgba(255,255,255,0.04), transparent 70%); }
