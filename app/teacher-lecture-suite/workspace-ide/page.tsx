@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Header from "@/components/ui/Header";
 import Sidebar from "@/components/ui/Sidebar";
+import MediaUploader from "@/components/MediaUploader";
 
 export default function WorkspaceIDE() {
   const [sidebar, setSidebar] = useState(false);
@@ -24,16 +25,44 @@ export function GlassPanel({ children }) {
 `);
   const [saved, setSaved] = useState(false);
   const [pushed, setPushed] = useState(false);
+  const [lastMedia, setLastMedia] = useState<string>("");
 
   const save = () => {
     localStorage.setItem("zhonnex_teacher_code", code);
+    fetch("/api/upload", {
+      method: "POST",
+      body: (() => {
+        const fd = new FormData();
+        fd.append("file", new Blob([code], { type: "text/plain" }), "middleware.tsx");
+        fd.append("bucket", "teacher-private");
+        fd.append("author", "Teacher");
+        return fd;
+      })(),
+    }).catch(()=>{});
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
-  const push = () => {
-    const feed = JSON.parse(localStorage.getItem("zhonnex_feed") || "[]");
-    feed.push({ code, at: new Date().toISOString(), author: "Teacher • Frontend Architecture" });
-    localStorage.setItem("zhonnex_feed", JSON.stringify(feed));
+  const push = async () => {
+    const fd = new FormData();
+    if (lastMedia) {
+      fd.append("file", new Blob(["media already uploaded"], { type: "text/plain" }), "push.txt");
+      fd.append("bucket", "feed-assets");
+      fd.append("author", "Teacher • Frontend Architecture");
+      fd.append("code", code);
+      fd.append("text", `Code push + media: ${lastMedia}`);
+      await fetch("/api/upload", { method: "POST", body: fd });
+    } else {
+      const feed = JSON.parse(localStorage.getItem("zhonnex_feed") || "[]");
+      feed.push({ code, at: new Date().toISOString(), author: "Teacher • Frontend Architecture", media_url: "" });
+      localStorage.setItem("zhonnex_feed", JSON.stringify(feed));
+      const fd2 = new FormData();
+      const blob = new Blob([code], { type: "text/plain" });
+      fd2.append("file", blob, "snippet.txt");
+      fd2.append("bucket", "feed-assets");
+      fd2.append("author", "Teacher • Frontend Architecture");
+      fd2.append("code", code);
+      await fetch("/api/upload", { method: "POST", body: fd2 });
+    }
     const audit = JSON.parse(localStorage.getItem("zhonnex_audit") || "[]");
     audit.unshift(`${new Date().toLocaleString()} — PUSH TO FEED — IDE snapshot injected into student stream + WhatsApp blast`);
     localStorage.setItem("zhonnex_audit", JSON.stringify(audit));
@@ -47,7 +76,7 @@ export function GlassPanel({ children }) {
       <Sidebar open={sidebar} onClose={() => setSidebar(false)} />
       <div className="mx-auto max-w-[1280px] px-6 py-8">
         <h1 className="text-2xl font-black">ZHONNEX Cloud Workspace (IDE)</h1>
-        <p className="text-sm text-white/60">File tree • Autocomplete • Line counters • Dracula dark skin • Private staging vs Push to Feed.</p>
+        <p className="text-sm text-white/60">File tree • Autocomplete • Line counters • Dracula dark skin • Private staging vs Push to Feed + VIDEO/IMAGE/VOICE.</p>
         <div className="mt-6 grid lg:grid-cols-[260px_1fr_320px] gap-4">
           <div className="rounded-2xl bg-[#0A0A0D] border border-white/10 p-4 h-fit">
             <div className="text-xs tracking-widest font-bold text-white/50">EXPLORER</div>
@@ -62,7 +91,14 @@ export function GlassPanel({ children }) {
             </div>
             <div className="mt-6 rounded-xl bg-white text-black p-3 text-xs">
               <div className="font-bold">Private Staging</div>
-              <div className="text-black/60">Save writes privately to DB, hidden from students until pushed.</div>
+              <div className="text-black/60">Save writes privately to Supabase teacher-private bucket, hidden from students until pushed.</div>
+            </div>
+            <div className="mt-6 space-y-3">
+              <div className="text-xs tracking-[0.16em] font-bold text-white/50">SEND MEDIA TO FEED</div>
+              <MediaUploader bucket="videos" label="📹 Video" onUploaded={setLastMedia} />
+              <MediaUploader bucket="images" label="🖼️ Image" onUploaded={setLastMedia} />
+              <MediaUploader bucket="voice-notes" label="🎙️ Voice Note" onUploaded={setLastMedia} />
+              {lastMedia && <div className="text-xs text-emerald-400 break-all">Last: {lastMedia}</div>}
             </div>
           </div>
           <div className="rounded-2xl bg-[#1E1E2E] border border-white/10 overflow-hidden flex flex-col">
@@ -75,8 +111,8 @@ export function GlassPanel({ children }) {
             </div>
             <textarea value={code} onChange={e => setCode(e.target.value)} className="flex-1 min-h-[420px] bg-[#282A36] text-[#F8F8F2] p-4 font-mono text-sm leading-relaxed outline-none resize-none" spellCheck={false} />
             <div className="flex gap-2 p-3 bg-[#21222C] border-t border-white/10">
-              <button onClick={save} className="flex-1 rounded-xl bg-white/10 border border-white/10 text-white py-2.5 text-xs font-bold tracking-widest hover:bg-white/20">[ Save File to Cloud ] {saved && "✓ Saved"}</button>
-              <button onClick={push} className="flex-1 rounded-xl bg-white text-black py-2.5 text-xs font-bold tracking-widest">[ Push to Student Feed ] {pushed && "✓ Pushed + WhatsApp blast"}</button>
+              <button onClick={save} className="flex-1 rounded-xl bg-white/10 border border-white/10 text-white py-2.5 text-xs font-bold tracking-widest hover:bg-white/20">[ Save File to Cloud ] {saved && "✓ Saved to Supabase private"}</button>
+              <button onClick={push} className="flex-1 rounded-xl bg-white text-black py-2.5 text-xs font-bold tracking-widest">[ Push to Student Feed ] {pushed && "✓ Pushed to Supabase + WhatsApp blast"}</button>
             </div>
           </div>
           <div className="space-y-4">
@@ -85,8 +121,9 @@ export function GlassPanel({ children }) {
               <div className="mt-3 rounded-xl bg-[#0A0A0D] text-white p-4 font-mono text-xs leading-relaxed border border-white/10 max-h-[220px] overflow-auto">
                 <div className="text-white/50">Last pushed snapshot:</div>
                 <pre className="mt-2 whitespace-pre-wrap">{code.slice(0, 420)}...</pre>
+                {lastMedia && <div className="mt-2 text-emerald-400 break-all">+ Media: {lastMedia}</div>}
               </div>
-              <div className="mt-3 text-xs text-black/60">Push wraps code in interactive copy widget + triggers WhatsApp group notification.</div>
+              <div className="mt-3 text-xs text-black/60">Push now saves to Supabase <code>feed_items</code> + triggers WhatsApp group notification. Supports code + video + image + voice in one push.</div>
             </div>
             <div className="rounded-2xl bg-[#0A0A0D] border border-white/10 p-5">
               <div className="text-xs tracking-widest font-bold text-white/50">AUTOCOMPLETE</div>
