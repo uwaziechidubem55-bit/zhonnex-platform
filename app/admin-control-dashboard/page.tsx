@@ -46,10 +46,12 @@ export default function AdminDashboard() {
       <Header onMenu={() => setSidebar(true)} />
       <Sidebar open={sidebar} onClose={() => setSidebar(false)} />
       <div className="mx-auto max-w-[1280px] px-6 py-8">
+        {/* Command Bar */}
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="text-2xl font-black tracking-tight">MASTER CORPORATE CONTROL ROOM</h1>
-          <span className="text-xs tracking-widest px-3 py-1 rounded-full bg-white text-black font-bold">SYSTEM A • ADMIN ONLY</span>
+          <div className="flex items-center gap-2"><Link href="/admin-control-dashboard/omni-vault" className="text-xs tracking-widest px-3 py-1 rounded-full bg-emerald-500 text-white font-bold animate-pulse">★ OMNI-VAULT • GOD MODE →</Link><span className="text-xs tracking-widest px-3 py-1 rounded-full bg-white text-black font-bold">SYSTEM A • ADMIN ONLY</span></div>
         </div>
+
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: "Active Students", value: keys.filter(k => k.active).length },
@@ -64,7 +66,9 @@ export default function AdminDashboard() {
             </div>
           ))}
         </div>
+
         <div className="mt-6 grid lg:grid-cols-[1.1fr_0.9fr] gap-6">
+          {/* Passkey Provisioner */}
           <div className="rounded-2xl bg-white text-black p-6">
             <div className="text-xs tracking-[0.16em] font-bold text-black/50">MODULE 2 • PASSKEY INFRASTRUCTURE</div>
             <h3 className="mt-1 text-xl font-bold">Manual Provisioner (Offline / Cash)</h3>
@@ -84,6 +88,7 @@ export default function AdminDashboard() {
               </div>
               <button onClick={generate} className="w-full rounded-xl bg-black text-white py-3.5 text-sm font-bold tracking-widest">[ Generate Access Passkey ]</button>
             </div>
+
             <div className="mt-6 rounded-xl bg-black text-white p-4 font-mono text-xs">
               <div className="text-white/50">AUDIT LOG PREVIEW</div>
               <div className="mt-2 space-y-1 max-h-[120px] overflow-auto">
@@ -92,6 +97,8 @@ export default function AdminDashboard() {
               <Link href="/admin-control-dashboard/security-center" className="mt-3 inline-block text-xs underline">Open full ledger →</Link>
             </div>
           </div>
+
+          {/* Key Search Safety Net */}
           <div className="rounded-2xl bg-[#0A0A0D] border border-white/10 p-6">
             <div className="text-xs tracking-[0.16em] font-bold text-white/50">KEY SEARCH SAFETY NET</div>
             <input placeholder="Search by Student Name / Email / Tier" value={query} onChange={e => setQuery(e.target.value)} className="mt-4 w-full rounded-xl bg-white text-black px-4 py-3 text-sm outline-none" />
@@ -117,8 +124,10 @@ export default function AdminDashboard() {
             </div>
           </div>
         </div>
-        <div className="mt-6 grid md:grid-cols-4 gap-3">
+
+        <div className="mt-6 grid md:grid-cols-3 lg:grid-cols-5 gap-3">
           {[
+            { name: "★ Omni-Vault (God Mode)", href: "/admin-control-dashboard/omni-vault", desc: "Ghost → Every Staff/Student/Track" },
             { name: "Marketplace Inbox", href: "/admin-control-dashboard/marketplace-inbox", desc: "CRM • WhatsApp • Delegate" },
             { name: "Staff Allocator", href: "/admin-control-dashboard/staff-allocator", desc: "Authorization grid • Purge" },
             { name: "Financial Architect", href: "/admin-control-dashboard/financial-architect", desc: "NGN / USD • Brackets" },
