@@ -123,7 +123,7 @@ export default function LandingPage() {
   return (
     <main className="min-h-screen">
       <Header onMenu={() => setSidebar(true)} />
-      <Sidebar open={sidebar} onClose={() => setSidebar(false)} />
+      <Sidebar open={sidebar} onClose={() => setSidebar(false)} mode="public" />
       <section className="mx-auto max-w-[1280px] px-6 py-10 md:py-14">
         <div className="relative rounded-[28px] border border-white/10 bg-[#0A0A0D] overflow-hidden">
           <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(600px 400px at 50% 0%, rgba(255,255,255,0.06), transparent 70%)" }} />
@@ -241,7 +241,7 @@ export default function LandingPage() {
                   <input value={passkey} onChange={(e) => setPasskey(e.target.value)} placeholder="ETA-DMND-XXXX-Lagos" className="mt-6 w-full rounded-xl border border-black/10 px-4 py-3.5 font-mono text-sm tracking-widest outline-none focus:border-black/30" />
                   {passErr && <div className="mt-3 text-sm text-red-600">{passErr}</div>}
                   <button onClick={verifyPasskey} className="mt-4 w-full rounded-xl bg-black text-white py-3.5 text-sm font-bold tracking-widest hover:bg-black/90">VERIFY AND ENTER →</button>
-                  <div className="mt-4 flex gap-3 text-xs"><Link href="/student-course-dashboard/1" className="underline">Demo: Student Dashboard</Link><Link href="/admin-control-dashboard" className="underline">Admin Control Room</Link><Link href="/teacher-lecture-suite" className="underline">Teacher Suite</Link></div>
+                  {/* Demo links hidden — access via secret URL only */}
                 </div>
               </div>
             )}
