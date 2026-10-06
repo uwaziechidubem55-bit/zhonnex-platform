@@ -2,6 +2,11 @@
 import Link from "next/link";
 import { X, LayoutDashboard, KeyRound, Inbox, Users, Wallet, Shield, GraduationCap, Code2, ClipboardCheck, MessageSquare } from "lucide-react";
 
+const PUBLIC_NAV = [
+  { label: "Course Registration", sub: "Automated Tier Picker", href: "/?gate=register", icon: LayoutDashboard },
+  { label: "Enter Passkey Portal", sub: "Token Verification Gate", href: "/?gate=passkey", icon: KeyRound },
+];
+
 const NAV = [
   { label: "Course Registration", sub: "Automated Tier Picker", href: "/?gate=register", icon: LayoutDashboard },
   { label: "Enter Passkey Portal", sub: "Token Verification Gate", href: "/?gate=passkey", icon: KeyRound },
@@ -19,7 +24,8 @@ const NAV = [
   { label: "Student Dashboard #1", href: "/student-course-dashboard/1", icon: MessageSquare },
 ];
 
-export default function Sidebar({ open, onClose }: { open: boolean; onClose: () => void }) {
+export default function Sidebar({ open, onClose, mode = "full" }: { open: boolean; onClose: () => void; mode?: "public" | "full" }) {
+  const NAV_ITEMS = mode === "public" ? PUBLIC_NAV : NAV;
   return (
     <>
       <div className={`fixed inset-0 z-50 bg-black/60 backdrop-blur-sm transition ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`} onClick={onClose} />
@@ -31,7 +37,7 @@ export default function Sidebar({ open, onClose }: { open: boolean; onClose: () 
           </button>
         </div>
         <nav className="p-3 space-y-1 overflow-y-auto h-[calc(100vh-64px)]">
-          {NAV.map((item: any, i) =>
+          {NAV_ITEMS.map((item: any, i) =>
             item.divider ? (
               <div key={i} className="pt-4 pb-1 px-3 text-[10px] tracking-[0.18em] text-white/30 font-semibold">{item.label}</div>
             ) : (
