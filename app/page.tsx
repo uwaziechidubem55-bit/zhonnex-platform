@@ -7,7 +7,7 @@ import Link from "next/link";
 type Tier = "silver" | "gold" | "platinum" | "diamond";
 type Currency = "NGN" | "USD";
 
-const PRICING: Record<Currency, Record<Tier, number>> = {
+const DEFAULT_PRICING: Record<Currency, Record<Tier, number>> = {
   NGN: { silver: 45000, gold: 85000, platinum: 150000, diamond: 300000 },
   USD: { silver: 45, gold: 85, platinum: 150, diamond: 300 },
 };
@@ -25,6 +25,7 @@ export default function LandingPage() {
   const [view, setView] = useState<"hero" | "gateway" | "register" | "passkey" | "success">("hero");
   const [currency, setCurrency] = useState<Currency>("NGN");
   const [tier, setTier] = useState<Tier>("gold");
+  const [PRICING, setPRICING] = useState<Record<Currency, Record<Tier, number>>>(DEFAULT_PRICING);
   const [track] = useState(TRACKS[0]);
   const [form, setForm] = useState({ name: "", email: "", whatsapp: "" });
   const [key, setKey] = useState("");
@@ -32,6 +33,7 @@ export default function LandingPage() {
   const [passkey, setPasskey] = useState("");
   const [passErr, setPassErr] = useState("");
 
+  // Dynamic pricing — loads from Financial Architect (Supabase first, then localStorage fallback)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const p = params.get("gate");
@@ -41,6 +43,29 @@ export default function LandingPage() {
     const keyParam = params.get("key");
     if (pay === "success" && keyParam) { setKey(keyParam); setView("success"); }
     if (pay === "failed") alert("Payment failed. Please try again.");
+    // Load pricing from Financial Architect
+    fetch("/api/pricing").then(r=>r.json()).then(d=>{
+      if(d.pricing) setPRICING(d.pricing);
+      else {
+        const saved = localStorage.getItem("zhonnex_pricing");
+        if(saved){
+          const pr = JSON.parse(saved);
+          setPRICING({
+            NGN: { silver: pr.silverNGN, gold: pr.goldNGN, platinum: pr.platinumNGN, diamond: pr.diamondNGN },
+            USD: { silver: pr.silverUSD, gold: pr.goldUSD, platinum: pr.platinumUSD, diamond: pr.diamondUSD },
+          });
+        }
+      }
+    }).catch(()=>{
+      const saved = localStorage.getItem("zhonnex_pricing");
+      if(saved){
+        const pr = JSON.parse(saved);
+        setPRICING({
+          NGN: { silver: pr.silverNGN, gold: pr.goldNGN, platinum: pr.platinumNGN, diamond: pr.diamondNGN },
+          USD: { silver: pr.silverUSD, gold: pr.goldUSD, platinum: pr.platinumUSD, diamond: pr.diamondUSD },
+        });
+      }
+    });
   }, []);
 
   const [paying, setPaying] = useState(false);
