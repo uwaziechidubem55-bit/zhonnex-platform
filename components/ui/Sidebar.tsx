@@ -16,6 +16,7 @@ const NAV = [
   { label: "Staff Allocator", href: "/admin-control-dashboard/staff-allocator", icon: Users },
   { label: "Financial Architect", href: "/admin-control-dashboard/financial-architect", icon: Wallet },
   { label: "Security Center", href: "/admin-control-dashboard/security-center", icon: Shield },
+  { label: "★ Omni-Vault (God Mode)", href: "/admin-control-dashboard/omni-vault", icon: Shield },
   { label: "— LECTURE SUITE —", divider: true },
   { label: "Teacher Lecture Suite", href: "/teacher-lecture-suite", icon: GraduationCap },
   { label: "Cloud Workspace IDE", href: "/teacher-lecture-suite/workspace-ide", icon: Code2 },
